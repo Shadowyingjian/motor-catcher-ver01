@@ -33931,6 +33931,33 @@ SemaphoreHandle_t uart_rx_interrupt_sema3 = 0;
 gpio_irq_t gpio_level;
 int current_level = IRQ_LOW;
 
+
+
+
+
+
+
+
+
+ 
+
+int company_printf(const char* fmt, ...)
+{
+ char printf_buf[1024];
+ char * company_logo_buf2 = "Inthings:";
+ rtl_printf("\t %s \t",company_logo_buf2);
+ 
+ va_list args;                                        
+ 
+ int printed;
+ va_start(args, fmt);                               
+
+ printed = vsprintf(printf_buf, fmt, args);
+ va_end(args);                                     
+ puts(printf_buf);
+  return printed;
+}
+
 void gpio_level_irq_handler(uint32_t id,gpio_irq_event event)
 {
   uint32_t *level = (uint32_t *)id;
@@ -33967,6 +33994,33 @@ void gpio_level_irq_handler(uint32_t id,gpio_irq_event event)
 
 
 
+
+
+
+
+
+
+
+ 
+int LED_Init(gpio_t gpio_led1,PinName led_pin1,gpio_t gpio_led2,PinName led_pin2)
+{
+  
+
+    gpio_init(&gpio_led1,led_pin1);
+    gpio_dir(&gpio_led1, PIN_OUTPUT);    
+    gpio_mode(&gpio_led1, PullNone);     
+    
+    gpio_init(&gpio_led2,led_pin2);
+    gpio_dir(&gpio_led2, PIN_OUTPUT);    
+    gpio_mode(&gpio_led2, PullNone);     
+    
+    red_led_ctrl = 1;
+    green_led_ctrl = 1;
+    gpio_write(&gpio_led1, red_led_ctrl);
+    gpio_write(&gpio_led2, green_led_ctrl);
+    return 0;
+
+}
 
 
 
@@ -34027,7 +34081,7 @@ void gpio_demo_irq_handler (uint32_t id, gpio_irq_event event)
 
     red_led_ctrl = !red_led_ctrl;
     gpio_write(gpio_red_led, red_led_ctrl);
-    gpio_write(&gpio_green_led, 0);
+    
    
      if(xTaskGenericCreate( ( airkiss_gpio_init_thread ), ( ((const char*)"airkiss_gpio_init") ), ( (512 + 768) ), ( 0 ), ( ( ( UBaseType_t ) 0U ) + 2 + ( 4 ) ), ( 0 ), ( 0 ), ( 0 ) ) != ( ( ( BaseType_t ) 1 ) ))
         rtl_printf("\n\r%s xTaskCreate(init_thread) failed", __FUNCTION__);
@@ -34041,30 +34095,20 @@ void workwithairkiss_init_thread(void *param)
 
   
   gpio_irq_t gpio_btn;
-
+  LED_Init(gpio_red_led,PA_5,gpio_green_led,PA_0);
     
-    gpio_init(&gpio_red_led, PA_5);
-    gpio_dir(&gpio_red_led, PIN_OUTPUT);    
-    gpio_mode(&gpio_red_led, PullNone);     
-
-     gpio_init(&gpio_green_led, PA_0);
-    gpio_dir(&gpio_green_led, PIN_OUTPUT);    
-    gpio_mode(&gpio_green_led, PullNone);     
 
     
     gpio_irq_init(&gpio_btn, PA_12, gpio_demo_irq_handler, (uint32_t)(&gpio_red_led));
     gpio_irq_set(&gpio_btn, IRQ_FALL, 1);   
     gpio_irq_enable(&gpio_btn);
 
-    red_led_ctrl = 1;
-    green_led_ctrl = 1;
-    gpio_write(&gpio_red_led, red_led_ctrl);
-    gpio_write(&gpio_green_led, green_led_ctrl);
+    
 
 
 	 
 	LwIP_Init();
-#line 203 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\workwithairkiss.c"
+#line 247 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\workwithairkiss.c"
 	wifi_on(RTW_MODE_STA);
 
 	
@@ -34081,47 +34125,47 @@ void workwithairkiss_init_thread(void *param)
     
 
 
-	rtl_printf("\n\r%s(%d), Available heap 0x%x", __FUNCTION__, 219, xPortGetFreeHeapSize());	
+	rtl_printf("\n\r%s(%d), Available heap 0x%x", __FUNCTION__, 263, xPortGetFreeHeapSize());	
 
 
-#line 228 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\workwithairkiss.c"
+#line 272 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\workwithairkiss.c"
 
         
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-         rtl_printf("\r\n TimeDelay 3s\r\n");
-        rtw_mdelay_os(3000);
-        rtl_printf("\r\n TimeDelay 5s\r\n");
-        rtw_mdelay_os(5000);
-        rtl_printf("\r\n TimeDelay 5s  end \r\n");
+        int connectflag = -1;
+        connectflag = AIR_LoadWifiConfigT();
+        if(connectflag == 0)
+        {
+          company_printf("message: WifiConnect!!!\r\n");
+        }
+        else if(connectflag== 1)
+        {
+         company_printf("Error: Wifi Didn't Connect!!!\r\n");
+        }
+        else
+        {
+           company_printf("Error: Wifi Didn't Connect!!! connectflag = %d \r\n",connectflag);
+        }
+        
+       
+         rtl_printf("\r\n TimeDelay 1s\r\n");
+        rtw_mdelay_os(1000);
+        rtl_printf("\r\n TimeDelay 2s\r\n");
+        rtw_mdelay_os(2000);
+        rtl_printf("\r\n TimeDelay 3s  end \r\n");
        int ctflag = 1;
        ctflag = wifi_is_connected_to_ap();
        rtl_printf("\r\n =======ctflag = %d =======\r\n",ctflag);
        
        if(ctflag == 0)
        {
-            rtl_printf("\r\n === connect ap is ok !!!\r\n");
-            LED_Blink(PA_0,1000,5);
             
+            LED_Blink(PA_0,1000,5);
+            company_printf("Message: wifi connected!!!\r\n");
        }
        else
        {
-            rtl_printf("\r\n =====connect ap is failed !!!\r\n");
+           company_printf("Error: wifi connect AP failed!!!\r\n");
             LED_Blink(PA_5,1000,5);
             wifi_set_autoreconnect(0);
         }

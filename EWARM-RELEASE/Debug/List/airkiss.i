@@ -37164,8 +37164,6 @@ struct sockaddr_in g_stUDPBCAddr;
 
 
 
-
-
  
 static void     vProcessConnection( struct netconn *pxNetCon );
 
@@ -37173,6 +37171,8 @@ static void     vProcessConnection( struct netconn *pxNetCon );
  
  
 rtw_wifi_setting_t air_wifi_setting = {RTW_MODE_NONE, {0}, 0, RTW_SECURITY_OPEN, {0}};
+
+
 
 
 
@@ -37194,33 +37194,13 @@ static void AIR_LoadWifiSetting()
       ifname = "wlan1";
     }
     wifi_get_setting(ifname,&air_wifi_setting);
-     rtl_printf("\r\nLoadWifiSetting(): air_wifi_setting.ssid=%s\n", air_wifi_setting.ssid); 
+    rtl_printf("\r\nLoadWifiSetting(): air_wifi_setting.ssid=%s\n", air_wifi_setting.ssid); 
     rtl_printf("\r\nLoadWifiSetting(): air_wifi_setting.channel=%d\n", air_wifi_setting.channel);
     rtl_printf("\r\nLoadWifiSetting(): air_wifi_setting.security_type=%d\n", air_wifi_setting.security_type); 
     rtl_printf("\r\nLoadWifiSetting(): air_wifi_setting.password=%s\n", air_wifi_setting.password); 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-#line 314 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
+#line 294 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
 
 int AIR_LoadWifiConfigT()
 {
@@ -37473,7 +37453,7 @@ int airkiss_send_active_lan_discovery_packets(int client_socket_fd, int send_tim
 		return -1;
 	}
 
-#line 572 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
+#line 552 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
 
 	ret = airkiss_lan_pack(AIRKISS_LAN_SSDP_NOTIFY_CMD, "gh_390b83082bdd", device_mac, 0, 0, lan_buf, &lan_buf_len, &akconf); 
 	if (ret != AIRKISS_LAN_PAKE_READY) { 
@@ -37591,7 +37571,7 @@ void airkiss_lan_discovery_start(void* param)
 	int airkiss_sock_active = -1;
 	uint8_t *dev_mac = (uint8_t *)param;
 
-#line 696 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
+#line 676 "F:\\RTLworkSpace\\00009982-sdk-ameba-v4.0c\\sdk-ameba-v4.0c\\project\\zairkiss\\src\\airkiss.c"
 	do { if (2 <= 2) { if (2 <= 0) { rtl_printf("\r\nERROR: " "airkiss_lan_discovery_start\n"); } else { rtl_printf("\r\n" "airkiss_lan_discovery_start\n"); } }}while(0);  
 	airkiss_lan_server_create(airkiss_sock_active,dev_mac);
 	vTaskDelete(0);

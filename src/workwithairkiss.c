@@ -61,6 +61,33 @@ xSemaphoreHandle uart_rx_interrupt_sema3 = NULL;
 gpio_irq_t gpio_level;
 int current_level = IRQ_LOW;
 
+/*
+company_printf(const char* fmt,...);
+自定义printf函数
+example: 
+company_printf("hello-world!");
+output:         Inthings:       hello-world!
+*
+*
+*/
+
+int company_printf(const char* fmt, ...)
+{
+ char printf_buf[1024];
+ char * company_logo_buf2 = "Inthings:";
+ printf("\t %s \t",company_logo_buf2);
+ //printf("%s %s ",__DATE__,__TIME__);
+ va_list args;                                        /* args为定义的一个指向可变参数的变量，va_list以及下边要用到的va_start,va_end都是是在定义
+                                                                  可变参数函数中必须要用到宏， 在stdarg.h头文件中定义 */
+ int printed;
+ va_start(args, fmt);                               //初始化args的函数，使其指向可变参数的第一个参数，fmt是可变参数的前一个参数
+
+ printed = vsprintf(printf_buf, fmt, args);
+ va_end(args);                                     //结束可变参数的获取
+ puts(printf_buf);
+  return printed;
+}
+
 void gpio_level_irq_handler(uint32_t id,gpio_irq_event event)
 {
   uint32_t *level = (uint32_t *)id;
@@ -96,7 +123,34 @@ void gpio_level_irq_handler(uint32_t id,gpio_irq_event event)
 #endif
 
 
+/*
+LED_Init(gpio_t gpio_led1,PinName led_pin1,gpio_t gpio_led2,PinName led_pin2);
+gpio_led1 : 绑定PinName 和自定义变量名
+PinName：自定义的GPIO
+typedef struct gpio_s {
+	PinName pin;
+} gpio_t;
+return 0;
+*/
+int LED_Init(gpio_t gpio_led1,PinName led_pin1,gpio_t gpio_led2,PinName led_pin2)
+{
+  
+// Init LED control pin
+    gpio_init(&gpio_led1,led_pin1);
+    gpio_dir(&gpio_led1, PIN_OUTPUT);    // Direction: Output
+    gpio_mode(&gpio_led1, PullNone);     // No pull
+    
+    gpio_init(&gpio_led2,led_pin2);
+    gpio_dir(&gpio_led2, PIN_OUTPUT);    // Direction: Output
+    gpio_mode(&gpio_led2, PullNone);     // No pull
+    
+    red_led_ctrl = 1;
+    green_led_ctrl = 1;
+    gpio_write(&gpio_led1, red_led_ctrl);
+    gpio_write(&gpio_led2, green_led_ctrl);
+    return 0;
 
+}
 
 /*
 *  int LED_Blink(PinName ledpin,int delaytime,int times);
@@ -157,7 +211,7 @@ void gpio_demo_irq_handler (uint32_t id, gpio_irq_event event)
 
     red_led_ctrl = !red_led_ctrl;
     gpio_write(gpio_red_led, red_led_ctrl);
-    gpio_write(&gpio_green_led, 0);
+    //gpio_write(&gpio_green_led, 0);
    
      if(xTaskCreate(airkiss_gpio_init_thread, ((const char*)"airkiss_gpio_init"), STACKSIZE, NULL, tskIDLE_PRIORITY + 2 + PRIORITIE_OFFSET, NULL) != pdPASS)
         printf("\n\r%s xTaskCreate(init_thread) failed", __FUNCTION__);
@@ -171,25 +225,15 @@ void workwithairkiss_init_thread(void *param)
 
   
   gpio_irq_t gpio_btn;
-
-    // Init LED control pin
-    gpio_init(&gpio_red_led, GPIO_R_LED_PIN);
-    gpio_dir(&gpio_red_led, PIN_OUTPUT);    // Direction: Output
-    gpio_mode(&gpio_red_led, PullNone);     // No pull
-
-     gpio_init(&gpio_green_led, GPIO_G_LED_PIN);
-    gpio_dir(&gpio_green_led, PIN_OUTPUT);    // Direction: Output
-    gpio_mode(&gpio_green_led, PullNone);     // No pull
+  LED_Init(gpio_red_led,GPIO_R_LED_PIN,gpio_green_led,GPIO_G_LED_PIN);
+    
 
     // Initial Push Button pin as interrupt source
     gpio_irq_init(&gpio_btn, GPIO_IRQ_PIN, gpio_demo_irq_handler, (uint32_t)(&gpio_red_led));
     gpio_irq_set(&gpio_btn, IRQ_FALL, 1);   // Falling Edge Trigger
     gpio_irq_enable(&gpio_btn);
 
-    red_led_ctrl = 1;
-    green_led_ctrl = 1;
-    gpio_write(&gpio_red_led, red_led_ctrl);
-    gpio_write(&gpio_green_led, green_led_ctrl);
+    
 #if CONFIG_INIT_NET
 #if CONFIG_LWIP_LAYER
 	/* Initilaize the LwIP stack */
@@ -227,41 +271,41 @@ void workwithairkiss_init_thread(void *param)
 #endif	
 
         //在这里判断 flash区域中是否有内容 要是有内容 把SSID 和PASSWORD 读出 添加连接wifi的代码
-  /*
+  
         int connectflag = -1;
         connectflag = AIR_LoadWifiConfigT();
         if(connectflag == 0)
         {
-         printf("\r\n ======Wifi CONNECT!!!!-----\r\n");
+          company_printf("message: WifiConnect!!!\r\n");
         }
         else if(connectflag== 1)
         {
-         printf("\r\n ======Wifi Didn't CONNECT!!!!-----\r\n");
+         company_printf("Error: Wifi Didn't Connect!!!\r\n");
         }
         else
         {
-          printf("\r\n -=====Error :: connectflag = %d======\r\n",connectflag);
+           company_printf("Error: Wifi Didn't Connect!!! connectflag = %d \r\n",connectflag);
         }
         
-       */ 
-         printf("\r\n TimeDelay 3s\r\n");
-        rtw_mdelay_os(3000);
-        printf("\r\n TimeDelay 5s\r\n");
-        rtw_mdelay_os(5000);
-        printf("\r\n TimeDelay 5s  end \r\n");
+       
+         printf("\r\n TimeDelay 1s\r\n");
+        rtw_mdelay_os(1000);
+        printf("\r\n TimeDelay 2s\r\n");
+        rtw_mdelay_os(2000);
+        printf("\r\n TimeDelay 3s  end \r\n");
        int ctflag = 1;
        ctflag = wifi_is_connected_to_ap();
        printf("\r\n =======ctflag = %d =======\r\n",ctflag);
        
        if(ctflag == 0)
        {
-            printf("\r\n === connect ap is ok !!!\r\n");
-            LED_Blink(GPIO_G_LED_PIN,1000,5);
             
+            LED_Blink(GPIO_G_LED_PIN,1000,5);
+            company_printf("Message: wifi connected!!!\r\n");
        }
        else
        {
-            printf("\r\n =====connect ap is failed !!!\r\n");
+           company_printf("Error: wifi connect AP failed!!!\r\n");
             LED_Blink(GPIO_R_LED_PIN,1000,5);
             wifi_set_autoreconnect(0);
         }

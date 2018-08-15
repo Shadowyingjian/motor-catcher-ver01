@@ -24,8 +24,8 @@ void main(void)
 	/* wlan intialization */
 #if defined(CONFIG_WIFI_NORMAL) && defined(CONFIG_NETWORK)
 	//wlan_network();
-        SendPacket();
-      // workwithairkiss();
+      //  SendPacket();
+     workwithairkiss();
 #endif
 
 	/* Execute application example */

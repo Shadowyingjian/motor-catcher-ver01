@@ -89,8 +89,6 @@ static u8 gbssid[ETH_ALEN];
 int g_UDPBCServerFd = -1;
 struct sockaddr_in g_stUDPBCAddr;
 
-
-
 #define DEVICE_TYPE "gh_390b83082bdd" 
 #define DEVICE_ID "00E04C479520"
 #define AIRKISS_LAN_PORT 12476
@@ -126,6 +124,8 @@ rtw_wifi_setting_t air_wifi_setting = {RTW_MODE_NONE, {0}, 0, RTW_SECURITY_OPEN,
   #define WLAN1_NAME      	"wlan1"
 #endif 
 
+
+
 static void AIR_LoadWifiSetting()
 {
     const char *ifname = WLAN0_NAME;
@@ -135,31 +135,11 @@ static void AIR_LoadWifiSetting()
       ifname = WLAN1_NAME;
     }
     wifi_get_setting(ifname,&air_wifi_setting);
-     printf("\r\nLoadWifiSetting(): air_wifi_setting.ssid=%s\n", air_wifi_setting.ssid); 
+    printf("\r\nLoadWifiSetting(): air_wifi_setting.ssid=%s\n", air_wifi_setting.ssid); 
     printf("\r\nLoadWifiSetting(): air_wifi_setting.channel=%d\n", air_wifi_setting.channel);
     printf("\r\nLoadWifiSetting(): air_wifi_setting.security_type=%d\n", air_wifi_setting.security_type); 
     printf("\r\nLoadWifiSetting(): air_wifi_setting.password=%s\n", air_wifi_setting.password); 
 }
-/*
-static void AIR_LoadWifiSetting()
-{
-    const char *ifname = WLAN0_NAME;
-
-    if(rltk_wlan_running(WLAN1_IDX))
-    {//STA_AP_MODE
-    	ifname = WLAN1_NAME;
-    }
-
-    wifi_get_setting(ifname, &air_wifi_setting);
-
-    //printf("\r\nLoadWifiSetting(): wifi_setting.ssid=%s\n", wifi_setting.ssid); 
-    //printf("\r\nLoadWifiSetting(): wifi_setting.channel=%d\n", wifi_setting.channel);
-    //printf("\r\nLoadWifiSetting(): wifi_setting.security_type=%d\n", wifi_setting.security_type); 
-    //printf("\r\nLoadWifiSetting(): wifi_setting.password=%s\n", wifi_setting.password); 
-}
-
-*/
-
 
 #if CONFIG_READ_FLASH
 #ifndef CONFIG_PLATFORM_AMEBA_X
